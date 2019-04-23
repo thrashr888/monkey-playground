@@ -1,77 +1,102 @@
 import React, { Component } from 'react';
 import './App.css';
+import Files from './Files';
+import CurFile from './CurFile';
 
-import { NewEnvironment, Lexer, Parser, Eval } from 'monkey-typescript';
+/*
+TODO:
+- switch curFile to use name instead of index
+- save files to localStorage
+*/
 
 class App extends Component {
-  constructor() {
-    super();
-    this.env = NewEnvironment();
-
-    this.onChange = this.onChange.bind(this);
+  constructor(props) {
+    super(props);
 
     this.state = {
-      debug: '',
-      lines: `let double = fn(n){ n * 2 }
+      files: [
+        {
+          name: 'example.monkey',
+          text: `let double = fn(n){ n * 2 }
 let a = double(102)
 a * 21 - 84
 let hello = fn(name){ "Hello, " + name + "!" }
 hello("Paul")
-let bigNum = fn(x){x>500}
-`.split('\n'),
+let bigNum = fn(x){x>500}`,
+        },
+        {
+          name: 'blank.monkey',
+          text: '',
+        },
+      ],
     };
+    this.state.curFile = 0;
+
+    this.switchFile = this.switchFile.bind(this);
+    this.updateFile = this.updateFile.bind(this);
+    this.addFile = this.addFile.bind(this);
+    this.renameFile = this.renameFile.bind(this);
   }
 
-  eval(line) {
-    let l = new Lexer(line);
-    let p = new Parser(l);
-    let program = p.ParseProgram();
-
-    if (p.Errors().length !== 0) {
-      return [p.Errors(), null];
-    } else {
-      return [null, Eval(program, this.env)];
-    }
-  }
-
-  onChange(e) {
-    let input = e.target.value;
-    let lines = input.split('\n');
-
+  switchFile(curFile) {
+    console.log('switch file', curFile, this.state.files[curFile].name);
     this.setState({
-      debug: input,
-      lines,
+      curFile,
     });
   }
 
-  renderOutput(l) {
-    let out = this.eval(l);
-    if (!out[1]) {
-      return '';
-    }
-    return out[1].Inspect().replace(/\n/g, ' ');
+  updateFile(name, text) {
+    console.log('save file', name);
+
+    let files = this.state.files;
+
+    files.forEach((f, key) => {
+      if (f.name === name) {
+        files[key].text = text;
+      }
+    });
+
+    this.setState({ files });
+  }
+
+  addFile(name = 'new.monkey') {
+    let newFile = {
+      name,
+      text: '',
+    };
+    let files = [...this.state.files, newFile];
+    let curFile = files.length - 1;
+    this.setState({
+      files,
+      curFile,
+    });
+  }
+
+  renameFile(oldName, newName) {
+    console.log('rename file', oldName, newName);
+
+    let files = this.state.files;
+
+    files.forEach((f, key) => {
+      if (f.name === oldName) {
+        files[key].name = newName;
+      }
+    });
+
+    this.setState({ files });
   }
 
   render() {
-    let out = this.state.lines
-      .map(l => {
-        return this.renderOutput(l);
-      })
-      .join('\n');
     return (
       <div className="App">
-        <textarea
-          cols="45"
-          rows="35"
-          onKeyUp={this.onChange}
-          defaultValue={this.state.lines.join('\n')}
-          focus="true"
-        />
-        <textarea cols="25" rows="35" value={out} readOnly />
-        <br />
-        <pre>
-          <code>{this.state.debug}</code>
-        </pre>
+        <div style={{ display: 'flex' }}>
+          <Files files={this.state.files} chooseFile={this.switchFile} addFile={this.addFile} />
+          <CurFile
+            file={this.state.files[this.state.curFile]}
+            updateFile={this.updateFile}
+            renameFile={this.renameFile}
+          />
+        </div>
       </div>
     );
   }

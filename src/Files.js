@@ -23,19 +23,28 @@ class Files extends Component {
     this.props.addFile();
   }
 
+  renderFile(id, f) {
+    let isCurFile = this.props.curFile === id;
+    return (
+      <li key={f.name}>
+        <button
+          type="button"
+          class={'button ' + (isCurFile ? 'is-black' : '')}
+          onClick={this.handleClick(id)}
+        >
+          {f.name}
+        </button>
+      </li>
+    );
+  }
+
   render() {
     return (
-      <div className="Files">
+      <div class="Files column is-one-quarter">
         <ul>
-          {this.props.files.map((f, id) => (
-            <li key={f.name}>
-              <button type="button" onClick={this.handleClick(id)}>
-                {f.name}
-              </button>
-            </li>
-          ))}
+          {this.props.files.map((f, id) => this.renderFile(id, f))}
           <li>
-            <button type="button" onClick={this.handleAddFile}>
+            <button type="button" class="button is-primary" onClick={this.handleAddFile}>
               New
             </button>
           </li>

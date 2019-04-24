@@ -92,16 +92,37 @@ class CurFile extends Component {
 
   render() {
     return (
-      <div className="CurFile">
+      <div class="CurFile column">
         <div>
-          <input type="text" value={this.state.file.name} onChange={this.handleRename} />
-          <button type="button" onClick={this.handleSave}>
-            Save
-          </button>
+          <div class="field is-grouped">
+            <p class="control is-expanded">
+              <input
+                type="text"
+                class="input is-family-code"
+                value={this.state.file.name}
+                onChange={this.handleRename}
+              />
+            </p>
+            <p class="control">
+              <button type="button" class="button is-white" onClick={this.handleSave}>
+                Save
+              </button>
+            </p>
+          </div>
         </div>
-        <div>
-          <textarea cols="55" rows="30" onChange={this.handleChange} value={this.state.input} focus="true" />
-          <textarea cols="30" rows="30" value={this.renderOutput()} readOnly />
+        <div class="columns">
+          <div class="column">
+            <textarea
+              class="textarea is-family-code"
+              rows="20"
+              onChange={this.handleChange}
+              value={this.state.input}
+              focus="true"
+            />
+          </div>
+          <div class="column">
+            <textarea class="textarea is-family-code" rows="20" value={this.renderOutput()} readOnly />
+          </div>
         </div>
         <pre>
           <code>{this.state.debug}</code>

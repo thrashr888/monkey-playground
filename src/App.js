@@ -28,6 +28,22 @@ let bigNum = fn(x){x>500}`,
           name: 'blank.monkey',
           text: '',
         },
+        {
+          name: 'brass.monkey',
+          text: '',
+        },
+        {
+          name: 'funky.monkey',
+          text: '',
+        },
+        {
+          name: 'cheeky.monkey',
+          text: '',
+        },
+        {
+          name: 'barrel.monkey',
+          text: '',
+        },
       ],
     };
     this.state.curFile = 0;
@@ -88,16 +104,29 @@ let bigNum = fn(x){x>500}`,
 
   render() {
     return (
-      <div className="App">
-        <div style={{ display: 'flex' }}>
-          <Files files={this.state.files} chooseFile={this.switchFile} addFile={this.addFile} />
+      <section class="section">
+        <section class="hero">
+          <div class="hero-head">
+            <div class="container has-text-centered">
+              <h1 class="title">Monkey</h1>
+            </div>
+          </div>
+        </section>
+
+        <div class="container columns">
+          <Files
+            files={this.state.files}
+            curFile={this.state.curFile}
+            chooseFile={this.switchFile}
+            addFile={this.addFile}
+          />
           <CurFile
             file={this.state.files[this.state.curFile]}
             updateFile={this.updateFile}
             renameFile={this.renameFile}
           />
         </div>
-      </div>
+      </section>
     );
   }
 }

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import Files from './Files';
 import CurFile from './CurFile';
+import Storage from './lib/Storage';
 
 /*
 TODO:
@@ -13,40 +14,12 @@ class App extends Component {
   constructor(props) {
     super(props);
 
+    this.Storage = new Storage();
+
     this.state = {
-      files: [
-        {
-          name: 'example.monkey',
-          text: `let double = fn(n){ n * 2 }
-let a = double(102)
-a * 21 - 84
-let hello = fn(name){ "Hello, " + name + "!" }
-hello("Paul")
-let bigNum = fn(x){x>500}`,
-        },
-        {
-          name: 'blank.monkey',
-          text: '',
-        },
-        {
-          name: 'brass.monkey',
-          text: '',
-        },
-        {
-          name: 'funky.monkey',
-          text: '',
-        },
-        {
-          name: 'cheeky.monkey',
-          text: '',
-        },
-        {
-          name: 'barrel.monkey',
-          text: '',
-        },
-      ],
+      curFile: this.Storage.first(),
+      files: this.Storage.list(),
     };
-    this.state.curFile = 0;
 
     this.switchFile = this.switchFile.bind(this);
     this.updateFile = this.updateFile.bind(this);
@@ -55,51 +28,40 @@ let bigNum = fn(x){x>500}`,
   }
 
   switchFile(curFile) {
-    console.log('switch file', curFile, this.state.files[curFile].name);
-    this.setState({
-      curFile,
-    });
+    console.log('switch file', curFile);
+
+    this.setState({ curFile });
   }
 
   updateFile(name, text) {
     console.log('save file', name);
 
-    let files = this.state.files;
-
-    files.forEach((f, key) => {
-      if (f.name === name) {
-        files[key].text = text;
-      }
-    });
-
-    this.setState({ files });
+    this.Storage.write(name, text);
   }
 
-  addFile(name = 'new.monkey') {
-    let newFile = {
-      name,
-      text: '',
-    };
-    let files = [...this.state.files, newFile];
-    let curFile = files.length - 1;
+  addFile(name = 'new.monkey', text = '') {
+    console.log('add file', name);
+
+    this.Storage.write(name, text);
+
+    let files = this.Storage.list();
     this.setState({
       files,
-      curFile,
+      curFile: name,
     });
   }
 
   renameFile(oldName, newName) {
     console.log('rename file', oldName, newName);
 
-    let files = this.state.files;
+    this.Storage.move(oldName, newName);
 
-    files.forEach((f, key) => {
-      if (f.name === oldName) {
-        files[key].name = newName;
-      }
+    let files = this.Storage.list();
+    console.log(files);
+    this.setState({
+      files,
+      curFile: newName,
     });
-
-    this.setState({ files });
   }
 
   render() {
@@ -121,7 +83,8 @@ let bigNum = fn(x){x>500}`,
             addFile={this.addFile}
           />
           <CurFile
-            file={this.state.files[this.state.curFile]}
+            name={this.state.curFile}
+            text={this.Storage.read(this.state.curFile)}
             updateFile={this.updateFile}
             renameFile={this.renameFile}
           />

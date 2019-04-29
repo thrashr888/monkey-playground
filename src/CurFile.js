@@ -13,9 +13,9 @@ class CurFile extends Component {
 
     this.state = {
       dirty: false,
-      file: props.file,
-      input: props.file.text,
-      output: this.evalInput(props.file.text),
+      name: props.name,
+      text: props.text,
+      output: this.evalInput(props.text),
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -30,39 +30,36 @@ class CurFile extends Component {
     setTimeout(this.periodicSave.bind(this), SAVE_INTERVAL);
   }
 
-  setFile(file) {
+  setFile(name, text) {
     this.env = NewEnvironment();
     this.setState({
-      file,
-      input: file.text,
+      name,
+      text,
       dirty: false,
-      output: this.evalInput(file.text),
+      output: this.evalInput(text),
     });
   }
 
   componentDidUpdate(oldProps) {
     const newProps = this.props;
-    if (oldProps.file.name !== newProps.file.name) {
-      this.setFile(newProps.file);
+    if (oldProps.name !== newProps.name) {
+      this.setFile(newProps.name, newProps.text);
     }
   }
 
   handleRename(e) {
     let name = e.target.value;
-    let oldName = this.props.file.name;
+    let oldName = this.props.name;
 
     this.setState({
-      file: {
-        ...this.state.file,
-        name,
-      },
+      name,
     });
     this.props.renameFile(oldName, name);
   }
 
   handleSave() {
     if (this.state.dirty) {
-      this.props.updateFile(this.state.file.name, this.state.input);
+      this.props.updateFile(this.state.name, this.state.text);
       this.setState({
         dirty: false,
       });
@@ -73,7 +70,7 @@ class CurFile extends Component {
     this.env = NewEnvironment();
     this.setState({
       dirty: true,
-      input: e.target.value,
+      text: e.target.value,
       output: this.evalInput(e.target.value),
     });
   }
@@ -95,7 +92,6 @@ class CurFile extends Component {
       // return p.Errors().join(', ');
     }
 
-    debugger;
     let out = Eval(program, this.env);
     if (!out) {
       return '';
@@ -119,7 +115,7 @@ class CurFile extends Component {
               <input
                 type="text"
                 className="input is-family-code"
-                value={this.state.file.name}
+                value={this.state.name}
                 onChange={this.handleRename}
               />
             </p>
@@ -141,7 +137,7 @@ class CurFile extends Component {
               className="textarea is-family-code"
               rows="20"
               onChange={this.handleChange}
-              value={this.state.input}
+              value={this.state.text}
               focus="true"
             />
           </div>

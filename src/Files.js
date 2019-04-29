@@ -5,10 +5,6 @@ class Files extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      curFile: this.props.files[0],
-    };
-
     this.handleClick = this.handleClick.bind(this);
     this.handleAddFile = this.handleAddFile.bind(this);
   }
@@ -23,16 +19,16 @@ class Files extends Component {
     this.props.addFile();
   }
 
-  renderFile(id, f) {
-    let isCurFile = this.props.curFile === id;
+  renderFile(file) {
+    let isCurFile = this.props.curFile === file;
     return (
-      <li key={f.name}>
+      <li key={file}>
         <button
           type="button"
           className={'button ' + (isCurFile ? 'is-black' : '')}
-          onClick={this.handleClick(id)}
+          onClick={this.handleClick(file)}
         >
-          {f.name}
+          {file}
         </button>
       </li>
     );
@@ -42,7 +38,7 @@ class Files extends Component {
     return (
       <div className="Files column is-one-quarter">
         <ul>
-          {this.props.files.map((f, id) => this.renderFile(id, f))}
+          {this.props.files.map(file => this.renderFile(file))}
           <li>
             <button type="button" className="button is-primary" onClick={this.handleAddFile}>
               New

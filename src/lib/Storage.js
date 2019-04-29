@@ -20,21 +20,23 @@ export default class Storage {
   }
 
   write(name, content) {
-    this.files.set(name, content);
+    return this.files.set(name, content);
   }
 
   delete(name) {
-    this.files.delete(name);
+    return this.files.delete(name);
   }
 
   move(oldName, newName) {
     let content = this.read(oldName);
     this.write(newName, content);
     this.delete(oldName);
+    return true;
   }
 
   copy(fromName, toName) {
     let content = this.read(fromName);
     this.write(toName, content);
+    return true;
   }
 }

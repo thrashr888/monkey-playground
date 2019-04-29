@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import './CurFile.css';
 
-import { NewEnvironment, Lexer, Parser, Eval, OObject } from 'monkey-typescript';
-const { ERROR_OBJ } = OObject;
+import { NewEnvironment, Lexer, Parser, Eval } from 'monkey-typescript';
 
 const SAVE_INTERVAL = 2000;
 
@@ -10,17 +9,21 @@ class CurFile extends Component {
   constructor(props) {
     super(props);
     this.env = NewEnvironment();
+    this.env.Logger.Follow(this.followLogs.bind(this));
+    this.env.Logger.Log('fdas');
 
     this.state = {
       dirty: false,
       name: props.name,
       text: props.text,
       output: this.evalInput(props.text),
+      console: '',
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSave = this.handleSave.bind(this);
     this.handleRename = this.handleRename.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
 
     setTimeout(this.periodicSave.bind(this), SAVE_INTERVAL);
   }
@@ -30,13 +33,22 @@ class CurFile extends Component {
     setTimeout(this.periodicSave.bind(this), SAVE_INTERVAL);
   }
 
+  followLogs(date, messages) {
+    console.log(date, ...messages);
+    this.setState({
+      console: messages.join('\n'),
+    });
+  }
+
   setFile(name, text) {
     this.env = NewEnvironment();
+    this.env.Logger.Follow(this.followLogs.bind(this));
     this.setState({
       name,
       text,
       dirty: false,
       output: this.evalInput(text),
+      console: '',
     });
   }
 
@@ -66,8 +78,20 @@ class CurFile extends Component {
     }
   }
 
+  handleDelete() {
+    this.props.deleteFile(this.state.name);
+    this.setState({
+      name: '',
+      text: '',
+      dirty: false,
+      output: [],
+      console: '',
+    });
+  }
+
   handleChange(e) {
     this.env = NewEnvironment();
+    this.env.Logger.Follow(this.followLogs.bind(this));
     this.setState({
       dirty: true,
       text: e.target.value,
@@ -76,34 +100,23 @@ class CurFile extends Component {
   }
 
   evalInput(input) {
-    return input.split('\n').map(l => {
-      return this.evalLine(l);
-    });
-  }
-
-  evalLine(line) {
-    let l = new Lexer(line);
+    let l = new Lexer(input);
     let p = new Parser(l);
     let program = p.ParseProgram();
 
     // parser errors
     if (p.Errors().length !== 0) {
-      return '';
+      // return '';
+      this.setState({
+        errors: p.Errors(),
+      });
       // return p.Errors().join(', ');
     }
 
-    let out = Eval(program, this.env);
-    if (!out) {
-      return '';
-    }
-
-    // evaluation errors
-    if (out.Type() === ERROR_OBJ) {
-      return '';
-      // return out.Inspect().replace(/\n/g, ' ');
-    }
-
-    return out.Inspect().replace(/\n/g, ' ');
+    return program.Statements.map(s => {
+      let out = Eval(s, this.env);
+      return out ? out.Inspect() : '-';
+    }).join('\n');
   }
 
   render() {
@@ -128,6 +141,9 @@ class CurFile extends Component {
               >
                 {this.state.dirty ? '•' : null} Save
               </button>
+              <button type="button" className="button is-danger" onClick={this.handleDelete}>
+                Delete
+              </button>
             </p>
           </div>
         </div>
@@ -142,14 +158,10 @@ class CurFile extends Component {
             />
           </div>
           <div className="column">
-            <textarea
-              className="textarea is-family-code"
-              rows="20"
-              value={this.state.output.join('\n')}
-              readOnly
-            />
+            <textarea className="textarea is-family-code" rows="20" value={this.state.output} readOnly />
           </div>
         </div>
+        <textarea className="textarea is-family-code" value={this.state.console} readOnly />
       </div>
     );
   }

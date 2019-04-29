@@ -16,15 +16,22 @@ class App extends Component {
 
     this.Storage = new Storage();
 
+    let files = this.Storage.list();
+    if (!files || files.length === 0) {
+      this.Storage.write('new.monkey', 'let example = 1;');
+      files = this.Storage.list();
+    }
+
     this.state = {
       curFile: this.Storage.first(),
-      files: this.Storage.list(),
+      files,
     };
 
     this.switchFile = this.switchFile.bind(this);
     this.updateFile = this.updateFile.bind(this);
     this.addFile = this.addFile.bind(this);
     this.renameFile = this.renameFile.bind(this);
+    this.deleteFile = this.deleteFile.bind(this);
   }
 
   switchFile(curFile) {
@@ -40,14 +47,21 @@ class App extends Component {
   }
 
   addFile(name = 'new.monkey', text = '') {
-    console.log('add file', name);
+    // get an available new file name
+    let newName = name;
+    while (true) {
+      if (this.Storage.read(newName) === null) break;
+      newName = name + Math.floor(Math.random() * Math.floor(100));
+    }
 
-    this.Storage.write(name, text);
+    console.log('add file', newName);
+
+    this.Storage.write(newName, text);
 
     let files = this.Storage.list();
     this.setState({
       files,
-      curFile: name,
+      curFile: newName,
     });
   }
 
@@ -57,10 +71,21 @@ class App extends Component {
     this.Storage.move(oldName, newName);
 
     let files = this.Storage.list();
-    console.log(files);
     this.setState({
       files,
       curFile: newName,
+    });
+  }
+
+  deleteFile(name) {
+    console.log('delete file', name);
+
+    this.Storage.delete(name);
+
+    let files = this.Storage.list();
+    this.setState({
+      files,
+      curFile: this.Storage.first(),
     });
   }
 
@@ -87,6 +112,7 @@ class App extends Component {
             text={this.Storage.read(this.state.curFile)}
             updateFile={this.updateFile}
             renameFile={this.renameFile}
+            deleteFile={this.deleteFile}
           />
         </div>
       </section>

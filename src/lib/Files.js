@@ -8,7 +8,7 @@ export class File {
       let value = localStorage.getItem(key);
       return JSON.parse(value);
     }
-    return '';
+    return null;
   }
 
   static set(name, content) {
@@ -16,19 +16,22 @@ export class File {
     let value = JSON.stringify(content);
 
     if (localStorage.getItem(key)) {
-      return localStorage.setItem(key, value);
-    } else {
       localStorage.setItem(key, value);
-      return false;
+      return true;
     }
+
+    localStorage.setItem(key, value);
+    return false;
   }
 
   static delete(name) {
     let key = `${File.INDEX}${name}`;
 
     if (localStorage.getItem(key)) {
-      return localStorage.removeItem(key);
+      localStorage.removeItem(key);
+      return true;
     }
+
     return false;
   }
 }

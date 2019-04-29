@@ -10,4 +10,4 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 - npm test
 - npm run build
 
-![ss](https://www.evernote.com/l/AAEjxyJC9cNA-KgpqRv61sWyEz9dHTf28a0B/image.png)
+![ss](https://www.evernote.com/l/AAFq_mfEwARE_axN4zkAqaeAE6_139QFv1gB/image.png)

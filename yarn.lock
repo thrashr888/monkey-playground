@@ -6696,10 +6696,10 @@ mkdirp@0.5.1, mkdirp@0.5.x, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdi
   dependencies:
     minimist "0.0.8"
 
-monkey-typescript@^0.0.11:
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/monkey-typescript/-/monkey-typescript-0.0.11.tgz#e87b5045eb7147bbde56cf0032d5ed91ff4de2cd"
-  integrity sha512-ki49B0KDnqazOHpwcKDVb71ApxC1nJinHOrqWxGDc64eJbdTB3mCkVmPO9H6wZ6QWect9kjJVu8KFeFDu2bSzA==
+monkey-typescript@^0.0.15:
+  version "0.0.15"
+  resolved "https://registry.yarnpkg.com/monkey-typescript/-/monkey-typescript-0.0.15.tgz#3aec4254d5a5bb56a8fc11eae0c173cf9722d332"
+  integrity sha512-y9+8YnrivmnqSDMKZ4mND6TYsCov1m2GtUVam2rUdOkBhoQuKgXG4/mKelqHvkNDIh+kqzvjNBgZyEzU3BxPyg==
 
 move-concurrently@^1.0.1:
   version "1.0.1"

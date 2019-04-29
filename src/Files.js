@@ -29,7 +29,7 @@ class Files extends Component {
       <li key={f.name}>
         <button
           type="button"
-          class={'button ' + (isCurFile ? 'is-black' : '')}
+          className={'button ' + (isCurFile ? 'is-black' : '')}
           onClick={this.handleClick(id)}
         >
           {f.name}
@@ -40,11 +40,11 @@ class Files extends Component {
 
   render() {
     return (
-      <div class="Files column is-one-quarter">
+      <div className="Files column is-one-quarter">
         <ul>
           {this.props.files.map((f, id) => this.renderFile(id, f))}
           <li>
-            <button type="button" class="button is-primary" onClick={this.handleAddFile}>
+            <button type="button" className="button is-primary" onClick={this.handleAddFile}>
               New
             </button>
           </li>

@@ -104,16 +104,16 @@ let bigNum = fn(x){x>500}`,
 
   render() {
     return (
-      <section class="section">
-        <section class="hero">
-          <div class="hero-head">
-            <div class="container has-text-centered">
-              <h1 class="title">Monkey</h1>
+      <section className="section">
+        <section className="hero">
+          <div className="hero-head">
+            <div className="container has-text-centered">
+              <h1 className="title">Monkey</h1>
             </div>
           </div>
         </section>
 
-        <div class="container columns">
+        <div className="container columns">
           <Files
             files={this.state.files}
             curFile={this.state.curFile}

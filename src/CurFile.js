@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import './CurFile.css';
 
-import { NewEnvironment, Lexer, Parser, Eval } from 'monkey-typescript';
+import { NewEnvironment, Lexer, Parser, Eval, OObject } from 'monkey-typescript';
+const { ERROR_OBJ } = OObject;
+
+const SAVE_INTERVAL = 2000;
 
 class CurFile extends Component {
   constructor(props) {
@@ -10,14 +13,21 @@ class CurFile extends Component {
 
     this.state = {
       dirty: false,
-      debug: '',
       file: props.file,
       input: props.file.text,
+      output: this.evalInput(props.file.text),
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSave = this.handleSave.bind(this);
     this.handleRename = this.handleRename.bind(this);
+
+    setTimeout(this.periodicSave.bind(this), SAVE_INTERVAL);
+  }
+
+  periodicSave() {
+    this.handleSave();
+    setTimeout(this.periodicSave.bind(this), SAVE_INTERVAL);
   }
 
   setFile(file) {
@@ -26,6 +36,7 @@ class CurFile extends Component {
       file,
       input: file.text,
       dirty: false,
+      output: this.evalInput(file.text),
     });
   }
 
@@ -49,8 +60,13 @@ class CurFile extends Component {
     this.props.renameFile(oldName, name);
   }
 
-  handleSave(e) {
-    this.props.updateFile(this.state.file.name, this.state.input);
+  handleSave() {
+    if (this.state.dirty) {
+      this.props.updateFile(this.state.file.name, this.state.input);
+      this.setState({
+        dirty: false,
+      });
+    }
   }
 
   handleChange(e) {
@@ -58,75 +74,86 @@ class CurFile extends Component {
     this.setState({
       dirty: true,
       input: e.target.value,
+      output: this.evalInput(e.target.value),
     });
   }
 
-  eval(line) {
+  evalInput(input) {
+    return input.split('\n').map(l => {
+      return this.evalLine(l);
+    });
+  }
+
+  evalLine(line) {
     let l = new Lexer(line);
     let p = new Parser(l);
     let program = p.ParseProgram();
 
+    // parser errors
     if (p.Errors().length !== 0) {
-      return [p.Errors(), null];
-    } else {
-      return [null, Eval(program, this.env)];
+      return '';
+      // return p.Errors().join(', ');
     }
-  }
 
-  renderOutput(input) {
-    return this.state.input
-      .split('\n')
-      .map(l => {
-        return this.renderLine(l);
-      })
-      .join('\n');
-  }
-
-  renderLine(l) {
-    let out = this.eval(l);
-    if (!out[1]) {
+    debugger;
+    let out = Eval(program, this.env);
+    if (!out) {
       return '';
     }
-    return out[1].Inspect().replace(/\n/g, ' ');
+
+    // evaluation errors
+    if (out.Type() === ERROR_OBJ) {
+      return '';
+      // return out.Inspect().replace(/\n/g, ' ');
+    }
+
+    return out.Inspect().replace(/\n/g, ' ');
   }
 
   render() {
     return (
-      <div class="CurFile column">
+      <div className="CurFile column">
         <div>
-          <div class="field is-grouped">
-            <p class="control is-expanded">
+          <div className="field is-grouped">
+            <p className="control is-expanded">
               <input
                 type="text"
-                class="input is-family-code"
+                className="input is-family-code"
                 value={this.state.file.name}
                 onChange={this.handleRename}
               />
             </p>
-            <p class="control">
-              <button type="button" class="button is-white" onClick={this.handleSave}>
-                Save
+            <p className="control">
+              <button
+                type="button"
+                className="button is-white"
+                onClick={this.handleSave}
+                disabled={!this.state.dirty}
+              >
+                {this.state.dirty ? '•' : null} Save
               </button>
             </p>
           </div>
         </div>
-        <div class="columns">
-          <div class="column">
+        <div className="columns">
+          <div className="column">
             <textarea
-              class="textarea is-family-code"
+              className="textarea is-family-code"
               rows="20"
               onChange={this.handleChange}
               value={this.state.input}
               focus="true"
             />
           </div>
-          <div class="column">
-            <textarea class="textarea is-family-code" rows="20" value={this.renderOutput()} readOnly />
+          <div className="column">
+            <textarea
+              className="textarea is-family-code"
+              rows="20"
+              value={this.state.output.join('\n')}
+              readOnly
+            />
           </div>
         </div>
-        <pre>
-          <code>{this.state.debug}</code>
-        </pre>
       </div>
     );
   }

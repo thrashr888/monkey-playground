@@ -1,30 +1,14 @@
+import Files from './Files';
+
 export default class Storage {
-  files = new Map();
-
-  constructor() {
-    // this.files = new Map();
-
-    this.files.set(
-      'test.monkey',
-      `let double = fn(n){ n * 2 }
-let a = double(102)
-a * 21 - 84
-let hello = fn(name){ "Hello, " + name + "!" }
-hello("Paul")
-let bigNum = fn(x){x>500}`
-    );
-  }
-
-  dump() {
-    console.log(this.list());
-  }
+  files = new Files();
 
   first() {
-    return this.files.keys().next().value;
+    return this.files.keys()[0];
   }
 
   list() {
-    return Array.from(this.files.keys());
+    return this.files.keys();
   }
 
   size() {

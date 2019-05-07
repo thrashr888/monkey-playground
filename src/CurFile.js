@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
-import './CurFile.css';
+import './CurFile.scss';
 
 import { NewEnvironment, Lexer, Parser, Eval } from 'monkey-typescript';
+
+import Editor from 'react-simple-code-editor';
+import { highlight, languages } from 'prismjs/components/prism-core';
+import 'prismjs/components/prism-clike';
+import 'prismjs/components/prism-javascript';
 
 const SAVE_INTERVAL = 2000;
 
@@ -12,11 +17,14 @@ class CurFile extends Component {
     this.env.Logger.Follow(this.followLogs.bind(this));
     this.env.Logger.Log('fdas');
 
+    let [errors, output] = this.evalInput(props.text);
+
     this.state = {
       dirty: false,
       name: props.name,
       text: props.text,
-      output: this.evalInput(props.text),
+      errors,
+      output,
       console: '',
     };
 
@@ -33,8 +41,9 @@ class CurFile extends Component {
     setTimeout(this.periodicSave.bind(this), SAVE_INTERVAL);
   }
 
-  followLogs(date, messages) {
+  followLogs(date, messages = []) {
     console.log(date, ...messages);
+    if (this.state) messages = [this.state.console, ...messages];
     this.setState({
       console: messages.join('\n'),
     });
@@ -43,11 +52,15 @@ class CurFile extends Component {
   setFile(name, text) {
     this.env = NewEnvironment();
     this.env.Logger.Follow(this.followLogs.bind(this));
+
+    let [errors, output] = this.evalInput(text);
+
     this.setState({
       name,
       text,
       dirty: false,
-      output: this.evalInput(text),
+      errors,
+      output,
       console: '',
     });
   }
@@ -90,12 +103,19 @@ class CurFile extends Component {
   }
 
   handleChange(e) {
+    let value = e.target ? e.target.value : e;
+
     this.env = NewEnvironment();
     this.env.Logger.Follow(this.followLogs.bind(this));
+
+    let [errors, output] = this.evalInput(value);
+
     this.setState({
       dirty: true,
-      text: e.target.value,
-      output: this.evalInput(e.target.value),
+      text: value,
+      errors,
+      output,
+      console: '',
     });
   }
 
@@ -104,19 +124,20 @@ class CurFile extends Component {
     let p = new Parser(l);
     let program = p.ParseProgram();
 
+    let errors;
+    let output;
+
     // parser errors
     if (p.Errors().length !== 0) {
-      // return '';
-      this.setState({
-        errors: p.Errors(),
-      });
-      // return p.Errors().join(', ');
+      errors = p.Errors().join('\n');
     }
 
-    return program.Statements.map(s => {
+    output = program.Statements.map(s => {
       let out = Eval(s, this.env);
       return out ? out.Inspect() : '-';
     }).join('\n');
+
+    return [errors, output];
   }
 
   render() {
@@ -135,33 +156,58 @@ class CurFile extends Component {
             <p className="control">
               <button
                 type="button"
-                className="button is-white"
+                className="button is-success is-outlined"
                 onClick={this.handleSave}
                 disabled={!this.state.dirty}
               >
                 {this.state.dirty ? '•' : null} Save
               </button>
-              <button type="button" className="button is-danger" onClick={this.handleDelete}>
+              <button
+                type="button"
+                className="button is-danger is-outlined"
+                style={{ marginLeft: '0.75em' }}
+                onClick={this.handleDelete}
+              >
                 Delete
               </button>
             </p>
           </div>
         </div>
-        <div className="columns">
-          <div className="column">
-            <textarea
-              className="textarea is-family-code"
-              rows="20"
-              onChange={this.handleChange}
+        <div className="columns is-gapless" style={{ padding: '1.25em 0 0' }}>
+          <div className="column is-three-fifths">
+            <Editor
               value={this.state.text}
-              focus="true"
+              onValueChange={this.handleChange}
+              highlight={text => highlight(text, languages.js, 'javascript')}
+              padding={10}
+              className="container__editor"
+              style={{
+                fontFamily: '"Fira code", "Fira Mono", monospace',
+                fontSize: 14,
+              }}
             />
           </div>
           <div className="column">
-            <textarea className="textarea is-family-code" rows="20" value={this.state.output} readOnly />
+            <Editor
+              value={this.state.output}
+              highlight={output => highlight(output, languages.js, 'javascript')}
+              padding={10}
+              className="container__editor"
+              style={{
+                fontFamily: '"Fira code", "Fira Mono", monospace',
+                fontSize: 14,
+              }}
+            />
           </div>
         </div>
-        <textarea className="textarea is-family-code" value={this.state.console} readOnly />
+        <p>
+          Errors
+          <textarea className="textarea is-family-code" value={this.state.errors} readOnly />
+        </p>
+        <p>
+          Console
+          <textarea className="textarea is-family-code" value={this.state.console} readOnly />
+        </p>
       </div>
     );
   }

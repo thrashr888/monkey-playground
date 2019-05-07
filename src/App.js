@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './App.css';
+import './App.scss';
 import Files from './Files';
 import CurFile from './CurFile';
 import Storage from './lib/Storage';
@@ -92,11 +92,17 @@ class App extends Component {
   render() {
     return (
       <section className="section">
-        <section className="hero">
+        <section className="hero" style={{ marginBottom: '2em' }}>
           <div className="hero-head">
-            <div className="container has-text-centered">
-              <h1 className="title">Monkey</h1>
-            </div>
+            <nav className="navbar">
+              <div className="container">
+                <div className="navbar-brand">
+                  <a className="navbar-item" href="/">
+                    Monkey
+                  </a>
+                </div>
+              </div>
+            </nav>
           </div>
         </section>
 

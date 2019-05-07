@@ -1,22 +1,57 @@
+.CurFile {
+  margin-right: 1.25em;
+}
+
+.container__pair {
+  // border: 0.5px solid #b5bbbf;
+
+  margin: 1.5em 0 !important;
+}
+
 .container__editor {
   font-size: 14px;
   font-variant-ligatures: common-ligatures;
   background-color: #fff;
-  border: 0.5px solid #b5bbbf;
-  // border-radius: 3px;
+  // border-top: 0.5px solid #b5bbbf;
+  // border-left: 0.5px solid #b5bbbf;
+  // border-bottom: 0.5px solid #b5bbbf;
 }
 
 .container__editor textarea {
   outline: 0;
 }
 
+.container__output {
+  font-size: 14px;
+  font-variant-ligatures: common-ligatures;
+  background-color: #eff2fc;
+  height: 100%;
+
+  border-left: 2px solid #b5bbbf; // center divider
+
+  // border-top: 0.5px solid #b5bbbf;
+  // border-right: 0.5px solid #b5bbbf;
+  // border-bottom: 0.5px solid #b5bbbf;
+}
+
+.container__output textarea {
+  outline: 0;
+}
+
+.output-debug {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
+// undo bulma
 pre .number {
   align-items: normal !important;
   background-color: transparent !important;
   border-radius: 0 !important;
   display: inline !important;
   font-size: 14px !important;
-  height: auto !important;
+  // height: auto !important;
   justify-content: left !important;
   margin-right: 0rem !important;
   min-width: 1em !important;

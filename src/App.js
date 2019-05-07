@@ -46,7 +46,7 @@ class App extends Component {
     this.Storage.write(name, text);
   }
 
-  addFile(name = 'new.monkey', text = '') {
+  addFile(name = 'new.monkey', text = 'let example = 1;') {
     // get an available new file name
     let newName = name;
     while (true) {
@@ -91,7 +91,7 @@ class App extends Component {
 
   render() {
     return (
-      <section className="section">
+      <section className="section" style={{ padding: 0 }}>
         <section className="hero" style={{ marginBottom: '2em' }}>
           <div className="hero-head">
             <nav className="navbar">
@@ -106,7 +106,7 @@ class App extends Component {
           </div>
         </section>
 
-        <div className="container columns">
+        <div className="columns">
           <Files
             files={this.state.files}
             curFile={this.state.curFile}

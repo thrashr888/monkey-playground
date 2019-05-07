@@ -13,19 +13,16 @@ const SAVE_INTERVAL = 2000;
 class CurFile extends Component {
   constructor(props) {
     super(props);
-    this.env = NewEnvironment();
-    this.env.Logger.Follow(this.followLogs.bind(this));
-    this.env.Logger.Log('fdas');
 
-    let [errors, output] = this.evalInput(props.text);
-
+    // defaults
     this.state = {
-      dirty: false,
       name: props.name,
       text: props.text,
-      errors,
-      output,
-      console: '',
+      dirty: false,
+      debug: 'console',
+      console: [],
+      errors: [],
+      output: [],
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -43,32 +40,47 @@ class CurFile extends Component {
 
   followLogs(date, messages = []) {
     console.log(date, ...messages);
-    if (this.state) messages = [this.state.console, ...messages];
+    messages = [...this.state.console, date + ' ' + messages.join(' ')];
+    console.log(messages);
     this.setState({
-      console: messages.join('\n'),
+      console: messages,
     });
   }
 
-  setFile(name, text) {
+  componentDidMount() {
     this.env = NewEnvironment();
     this.env.Logger.Follow(this.followLogs.bind(this));
 
-    let [errors, output] = this.evalInput(text);
+    let [errors, output] = this.evalInput(this.props.text);
 
     this.setState({
-      name,
-      text,
-      dirty: false,
       errors,
       output,
-      console: '',
     });
   }
 
   componentDidUpdate(oldProps) {
     const newProps = this.props;
     if (oldProps.name !== newProps.name) {
-      this.setFile(newProps.name, newProps.text);
+      let name = newProps.name;
+      let text = newProps.text;
+
+      this.setState({
+        name,
+        text,
+        dirty: false,
+        console: [],
+      });
+
+      this.env = NewEnvironment();
+      this.env.Logger.Follow(this.followLogs.bind(this));
+
+      let [errors, output] = this.evalInput(text);
+
+      this.setState({
+        errors,
+        output,
+      });
     }
   }
 
@@ -98,12 +110,19 @@ class CurFile extends Component {
       text: '',
       dirty: false,
       output: [],
-      console: '',
+      console: [],
+      errors: [],
     });
   }
 
   handleChange(e) {
     let value = e.target ? e.target.value : e;
+
+    this.setState({
+      console: [],
+      dirty: true,
+      text: value,
+    });
 
     this.env = NewEnvironment();
     this.env.Logger.Follow(this.followLogs.bind(this));
@@ -111,11 +130,8 @@ class CurFile extends Component {
     let [errors, output] = this.evalInput(value);
 
     this.setState({
-      dirty: true,
-      text: value,
       errors,
       output,
-      console: '',
     });
   }
 
@@ -124,18 +140,18 @@ class CurFile extends Component {
     let p = new Parser(l);
     let program = p.ParseProgram();
 
-    let errors;
-    let output;
+    let errors = [];
+    let output = [];
 
     // parser errors
     if (p.Errors().length !== 0) {
-      errors = p.Errors().join('\n');
+      errors = p.Errors();
     }
 
     output = program.Statements.map(s => {
       let out = Eval(s, this.env);
-      return out ? out.Inspect() : '-';
-    }).join('\n');
+      return out ? out.Inspect() : '';
+    });
 
     return [errors, output];
   }
@@ -173,7 +189,7 @@ class CurFile extends Component {
             </p>
           </div>
         </div>
-        <div className="columns is-gapless" style={{ padding: '1.25em 0 0' }}>
+        <div className="columns is-gapless container__pair">
           <div className="column is-three-fifths">
             <Editor
               value={this.state.text}
@@ -189,10 +205,11 @@ class CurFile extends Component {
           </div>
           <div className="column">
             <Editor
-              value={this.state.output}
+              value={this.state.output.join('\n')}
+              onValueChange={() => null}
               highlight={output => highlight(output, languages.js, 'javascript')}
               padding={10}
-              className="container__editor"
+              className="container__output"
               style={{
                 fontFamily: '"Fira code", "Fira Mono", monospace',
                 fontSize: 14,
@@ -200,14 +217,24 @@ class CurFile extends Component {
             />
           </div>
         </div>
-        <p>
-          Errors
-          <textarea className="textarea is-family-code" value={this.state.errors} readOnly />
-        </p>
-        <p>
-          Console
-          <textarea className="textarea is-family-code" value={this.state.console} readOnly />
-        </p>
+
+        <div class="tabs is-boxed">
+          <ul>
+            <li class={this.state.debug === 'console' ? 'is-active' : null}>
+              <a onClick={e => this.setState({ debug: 'console' })}>Console ({this.state.console.length})</a>
+            </li>
+            <li class={this.state.debug === 'errors' ? 'is-active' : null}>
+              <a onClick={e => this.setState({ debug: 'errors' })}>Errors ({this.state.errors.length})</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <textarea
+            className="output-debug textarea is-family-code"
+            value={this.state[this.state.debug].join('\n')}
+            readOnly
+          />
+        </div>
       </div>
     );
   }

@@ -198,8 +198,8 @@ class CurFile extends Component {
               padding={10}
               className="container__editor"
               style={{
-                fontFamily: '"Fira code", "Fira Mono", monospace',
-                fontSize: 14,
+                fontFamily: 'Menlo, monospace',
+                fontSize: 15,
               }}
             />
           </div>
@@ -211,19 +211,19 @@ class CurFile extends Component {
               padding={10}
               className="container__output"
               style={{
-                fontFamily: '"Fira code", "Fira Mono", monospace',
-                fontSize: 14,
+                fontFamily: 'Menlo, monospace',
+                fontSize: 15,
               }}
             />
           </div>
         </div>
 
-        <div class="tabs is-boxed">
+        <div className="tabs is-boxed">
           <ul>
-            <li class={this.state.debug === 'console' ? 'is-active' : null}>
+            <li className={this.state.debug === 'console' ? 'is-active' : null}>
               <a onClick={e => this.setState({ debug: 'console' })}>Console ({this.state.console.length})</a>
             </li>
-            <li class={this.state.debug === 'errors' ? 'is-active' : null}>
+            <li className={this.state.debug === 'errors' ? 'is-active' : null}>
               <a onClick={e => this.setState({ debug: 'errors' })}>Errors ({this.state.errors.length})</a>
             </li>
           </ul>

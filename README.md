@@ -9,10 +9,6 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 - npm start
 - npm test
 - npm run build
+- npm run deploy
 
 ![ss](https://www.evernote.com/l/AAFq_mfEwARE_axN4zkAqaeAE6_139QFv1gB/image.png)
-
-## Deploy
-
-    $ npm run build
-    $ aws s3 cp build/ s3://monkey.thrasher.dev/ --recursive --acl public-read-write

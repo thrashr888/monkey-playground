@@ -1,4 +1,18 @@
-@import 'node_modules/bulmaswatch/lux/bulmaswatch';
+$family-monospace: Menlo, monospace;
+
+$weight-light: 400;
+$weight-normal: 500;
+$weight-medium: 600;
+$weight-semibold: 700;
+$weight-bold: 800;
+
+$navbar-height: 5rem;
+
+// $tabs-toggle-link-border-width: 1px;
+// $tabs-border-bottom-width: 1px;
+// $tabs-toggle-link-border-color: #b5bbbf;
+
+@import 'node_modules/bulmaswatch/minty/bulmaswatch';
 
 body {
   margin: 0;
@@ -11,4 +25,12 @@ body {
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+.navbar {
+  border-radius: 0;
+}
+.navbar-brand .navbar-item {
+  padding-left: 18px;
+  font-weight: $weight-medium;
 }

@@ -95,12 +95,10 @@ class App extends Component {
         <section className="hero" style={{ marginBottom: '2em' }}>
           <div className="hero-head">
             <nav className="navbar">
-              <div className="container">
-                <div className="navbar-brand">
-                  <a className="navbar-item" href="/">
-                    Monkey
-                  </a>
-                </div>
+              <div className="navbar-brand">
+                <a className="navbar-item" href="/">
+                  Monkey
+                </a>
               </div>
             </nav>
           </div>

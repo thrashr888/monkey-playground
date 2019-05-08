@@ -40,14 +40,15 @@ class CurFile extends Component {
 
   followLogs(date, messages = []) {
     console.log(date, ...messages);
-    messages = [...this.state.console, date + ' ' + messages.join(' ')];
-    console.log(messages);
+
+    this.consoleLog = [...this.consoleLog, [date, ...messages].join(' ')];
     this.setState({
-      console: messages,
+      console: this.consoleLog,
     });
   }
 
   componentDidMount() {
+    this.consoleLog = [];
     this.env = NewEnvironment();
     this.env.Logger.Follow(this.followLogs.bind(this));
 
@@ -65,15 +66,17 @@ class CurFile extends Component {
       let name = newProps.name;
       let text = newProps.text;
 
-      this.setState({
-        name,
-        text,
-        dirty: false,
-        console: [],
-      });
-
+      this.consoleLog = [];
       this.env = NewEnvironment();
       this.env.Logger.Follow(this.followLogs.bind(this));
+
+      this.setState({
+        name: name,
+        text: text,
+        dirty: false,
+        debug: 'console',
+        console: [],
+      });
 
       let [errors, output] = this.evalInput(text);
 
@@ -124,6 +127,7 @@ class CurFile extends Component {
       text: value,
     });
 
+    this.consoleLog = [];
     this.env = NewEnvironment();
     this.env.Logger.Follow(this.followLogs.bind(this));
 
@@ -221,10 +225,14 @@ class CurFile extends Component {
         <div className="tabs is-boxed">
           <ul>
             <li className={this.state.debug === 'console' ? 'is-active' : null}>
-              <a onClick={e => this.setState({ debug: 'console' })}>Console ({this.state.console.length})</a>
+              <a href="{this.state.curFile}" onClick={e => this.setState({ debug: 'console' })}>
+                Console ({this.state.console.length})
+              </a>
             </li>
             <li className={this.state.debug === 'errors' ? 'is-active' : null}>
-              <a onClick={e => this.setState({ debug: 'errors' })}>Errors ({this.state.errors.length})</a>
+              <a href="{this.state.curFile}" onClick={e => this.setState({ debug: 'errors' })}>
+                Errors ({this.state.errors.length})
+              </a>
             </li>
           </ul>
         </div>

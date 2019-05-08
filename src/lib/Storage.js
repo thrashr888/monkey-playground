@@ -19,6 +19,10 @@ export default class Storage {
     return this.files.get(name);
   }
 
+  exists(name) {
+    return this.files.exists(name);
+  }
+
   write(name, content) {
     return this.files.set(name, content);
   }

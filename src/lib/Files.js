@@ -11,6 +11,12 @@ export class File {
     return null;
   }
 
+  static exists(name) {
+    let key = `${File.INDEX}${name}`;
+
+    return localStorage.getItem(key) ? true : false;
+  }
+
   static set(name, content) {
     let key = `${File.INDEX}${name}`;
     let value = JSON.stringify(content);
@@ -55,6 +61,10 @@ export default class Files {
 
   get(name) {
     return File.get(name);
+  }
+
+  exists(name) {
+    return File.exists(name);
   }
 
   set(name, content) {

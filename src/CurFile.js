@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './CurFile.scss';
 
-import { NewEnvironment, Lexer, Parser, Eval } from 'monkey-typescript';
+import { NewEnvironment, Lexer, Parser, Eval, OObject } from 'monkey-typescript';
 
 import Editor from 'react-simple-code-editor';
 import { highlight, languages } from 'prismjs/components/prism-core';
@@ -9,6 +9,8 @@ import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 
 const SAVE_INTERVAL = 2000;
+
+// TODO capture logs from inner envs
 
 class CurFile extends Component {
   constructor(props) {
@@ -152,9 +154,19 @@ class CurFile extends Component {
       errors = p.Errors();
     }
 
-    output = program.Statements.map(s => {
+    program.Statements.forEach(s => {
       let out = Eval(s, this.env);
-      return out ? out.Inspect() : '';
+      let line = s.Token.Position.Line - 1;
+      // let lineCount = out.split(/\r\n|\r|\n/).length;
+      let ret = '';
+
+      if (out && out.Type() === OObject.FUNCTION_OBJ) {
+        ret = 'fn()';
+      } else if (out) {
+        ret = out.Inspect().replace(/\r\n|\r|\n/g, '');
+      }
+
+      output[line] = ret;
     });
 
     return [errors, output];
@@ -225,12 +237,12 @@ class CurFile extends Component {
         <div className="tabs is-boxed">
           <ul>
             <li className={this.state.debug === 'console' ? 'is-active' : null}>
-              <a href="{this.state.curFile}" onClick={e => this.setState({ debug: 'console' })}>
+              <a href={'#' + this.state.name} onClick={e => this.setState({ debug: 'console' })}>
                 Console ({this.state.console.length})
               </a>
             </li>
             <li className={this.state.debug === 'errors' ? 'is-active' : null}>
-              <a href="{this.state.curFile}" onClick={e => this.setState({ debug: 'errors' })}>
+              <a href={'#' + this.state.name} onClick={e => this.setState({ debug: 'errors' })}>
                 Errors ({this.state.errors.length})
               </a>
             </li>

@@ -11,4 +11,4 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 - npm run build
 - npm run deploy
 
-![ss](https://www.evernote.com/l/AAFq_mfEwARE_axN4zkAqaeAE6_139QFv1gB/image.png)
+![ss](https://www.evernote.com/l/AAGoU7NHsDJOQYUh7yZfdwg3NEMC-EHc4f0B/image.png)

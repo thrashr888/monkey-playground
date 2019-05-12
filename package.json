@@ -6,7 +6,7 @@
   "dependencies": {
     "bulma": "^0.7.4",
     "bulmaswatch": "^0.7.2",
-    "monkey-typescript": "^0.0.19",
+    "monkey-typescript": "^0.0.22",
     "node-sass": "^4.12.0",
     "prismjs": "^1.16.0",
     "react": "^16.8.6",

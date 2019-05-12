@@ -8,9 +8,7 @@ import { highlight, languages } from 'prismjs/components/prism-core';
 import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 
-const SAVE_INTERVAL = 2000;
-
-// TODO capture logs from inner envs
+const SAVE_INTERVAL = 5000;
 
 class CurFile extends Component {
   constructor(props) {
@@ -25,6 +23,8 @@ class CurFile extends Component {
       console: [],
       errors: [],
       output: [],
+      notifyConsole: false,
+      notifyErrors: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -46,6 +46,7 @@ class CurFile extends Component {
     this.consoleLog = [...this.consoleLog, [date, ...messages].join(' ')];
     this.setState({
       console: this.consoleLog,
+      notifyConsole: true,
     });
   }
 
@@ -59,6 +60,8 @@ class CurFile extends Component {
     this.setState({
       errors,
       output,
+      notifyErrors: errors.length ? true : false,
+      debug: errors.length ? 'errors' : 'console',
     });
   }
 
@@ -85,6 +88,8 @@ class CurFile extends Component {
       this.setState({
         errors,
         output,
+        notifyErrors: errors.length ? true : false,
+        debug: errors.length ? 'errors' : 'console',
       });
     }
   }
@@ -138,6 +143,8 @@ class CurFile extends Component {
     this.setState({
       errors,
       output,
+      notifyErrors: errors.length ? true : false,
+      debug: errors.length ? 'errors' : 'console',
     });
   }
 
@@ -159,6 +166,8 @@ class CurFile extends Component {
       let line = s.Token.Position.Line - 1;
       // let lineCount = out.split(/\r\n|\r|\n/).length;
       let ret = '';
+
+      // console.log(s, out);
 
       if (out && out.Type() === OObject.FUNCTION_OBJ) {
         ret = 'fn()';
@@ -237,13 +246,21 @@ class CurFile extends Component {
         <div className="tabs is-boxed">
           <ul>
             <li className={this.state.debug === 'console' ? 'is-active' : null}>
-              <a href={'#' + this.state.name} onClick={e => this.setState({ debug: 'console' })}>
-                Console ({this.state.console.length})
+              <a
+                href={'#' + this.state.name}
+                onClick={e => this.setState({ debug: 'console', notifyConsole: false })}
+              >
+                Console ({this.state.notifyConsole ? '•' : null}
+                {this.state.console.length})
               </a>
             </li>
             <li className={this.state.debug === 'errors' ? 'is-active' : null}>
-              <a href={'#' + this.state.name} onClick={e => this.setState({ debug: 'errors' })}>
-                Errors ({this.state.errors.length})
+              <a
+                href={'#' + this.state.name}
+                onClick={e => this.setState({ debug: 'errors', notifyErrors: false })}
+              >
+                Errors ({this.state.notifyErrors ? '•' : null}
+                {this.state.errors.length})
               </a>
             </li>
           </ul>
@@ -255,6 +272,13 @@ class CurFile extends Component {
             readOnly
           />
         </div>
+        {/* <div>
+          <div
+            dangerouslySetInnerHTML={{
+              __html: this.env && this.env.Get('main') ? this.env.Get('main').Inspect() : null,
+            }}
+          />
+        </div> */}
       </div>
     );
   }

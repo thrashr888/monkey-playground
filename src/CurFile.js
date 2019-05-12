@@ -269,6 +269,7 @@ class CurFile extends Component {
           <textarea
             className="output-debug textarea is-family-code"
             value={this.state[this.state.debug].join('\n')}
+            onClick={e => this.setState({ ['notify' + ucFirst(this.state.debug)]: false })}
             readOnly
           />
         </div>
@@ -282,6 +283,10 @@ class CurFile extends Component {
       </div>
     );
   }
+}
+
+function ucFirst(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 export default CurFile;

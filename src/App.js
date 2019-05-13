@@ -59,20 +59,22 @@ class App extends Component {
     this.Storage.write(name, text);
   }
 
-  addFile(name = 'new.monkey', text = 'let example = 1;') {
+  addFile(name = 'new.monkey', text = null) {
     // get an available new file name
     let newName = name;
+    let newText = text ? text : 'let example = 1;';
+
     while (true) {
       if (this.Storage.read(newName) === null) break;
       let fileName = name.substr(0, name.indexOf('.'));
       let randNum = Math.floor(Math.random() * Math.floor(100));
-      text = `let example = ${randNum};`;
+      if (!text) newText = `let example = ${randNum};`; // only if not given
       newName = `${fileName}-${randNum}.${EXT}`;
     }
 
     console.log('add file', newName);
 
-    this.Storage.write(newName, text);
+    this.Storage.write(newName, newText);
     window.location.hash = newName;
 
     let files = this.Storage.list();

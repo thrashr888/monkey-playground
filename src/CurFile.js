@@ -8,7 +8,7 @@ import { highlight, languages } from 'prismjs/components/prism-core';
 import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 
-const SAVE_INTERVAL = 5000;
+const SAVE_INTERVAL = 2000;
 
 class CurFile extends Component {
   constructor(props) {
@@ -162,12 +162,16 @@ class CurFile extends Component {
     }
 
     program.Statements.forEach(s => {
-      let out = Eval(s, this.env);
+      let out;
+      try {
+        out = Eval(s, this.env);
+      } catch (err) {
+        errors.push(err);
+      }
+
       let line = s.Token.Position.Line - 1;
       // let lineCount = out.split(/\r\n|\r|\n/).length;
       let ret = '';
-
-      // console.log(s, out);
 
       if (out && out.Type() === OObject.FUNCTION_OBJ) {
         ret = 'fn()';
@@ -180,6 +184,15 @@ class CurFile extends Component {
 
     return [errors, output];
   }
+
+  downloadTxtFile = (name, text) => {
+    const element = document.createElement('a');
+    const file = new Blob([text], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = name;
+    document.body.appendChild(element); // Required for this to work in FireFox
+    element.click();
+  };
 
   render() {
     return (
@@ -202,6 +215,14 @@ class CurFile extends Component {
                 disabled={!this.state.dirty}
               >
                 {this.state.dirty ? '•' : null} Save
+              </button>
+              <button
+                type="button"
+                className="button is-info is-outlined"
+                style={{ marginLeft: '0.75em' }}
+                onClick={e => this.downloadTxtFile(this.state.name, this.state.text)}
+              >
+                Download
               </button>
               <button
                 type="button"

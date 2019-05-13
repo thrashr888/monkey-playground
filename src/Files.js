@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import FileDrop from 'react-file-drop';
+
 import './Files.scss';
 
 class Files extends Component {
@@ -33,6 +35,37 @@ class Files extends Component {
     );
   }
 
+  readFile(inputFile) {
+    const temporaryFileReader = new FileReader();
+
+    return new Promise((resolve, reject) => {
+      temporaryFileReader.onerror = () => {
+        temporaryFileReader.abort();
+        reject(new DOMException('Problem parsing input file.'));
+      };
+
+      temporaryFileReader.onload = () => {
+        resolve(temporaryFileReader.result);
+      };
+      temporaryFileReader.readAsText(inputFile);
+    });
+  }
+
+  handleDrop = async (files, event) => {
+    console.log(files, event);
+    let file = files[0];
+
+    if (file.type !== '') {
+      // .monkey files
+      return;
+    }
+
+    let name = file.name;
+    let text = await this.readFile(file);
+
+    this.props.addFile(name, text);
+  };
+
   render() {
     return (
       <nav className="Files column is-one-quarter panel">
@@ -48,6 +81,9 @@ class Files extends Component {
             New
           </button>
         </div>
+        <FileDrop className="panel-block" onDrop={this.handleDrop}>
+          Drag and drop file here to upload
+        </FileDrop>
       </nav>
     );
   }

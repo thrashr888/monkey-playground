@@ -6847,10 +6847,10 @@ mkdirp@0.5.1, mkdirp@0.5.x, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdi
   dependencies:
     minimist "0.0.8"
 
-monkey-typescript@^0.0.22:
-  version "0.0.22"
-  resolved "https://registry.yarnpkg.com/monkey-typescript/-/monkey-typescript-0.0.22.tgz#736a298f4c04c7781af91a9c9aa35d956ec3c487"
-  integrity sha512-E5NMVJP9KByd20HfrAypgRtqfk0elOcMJNCjCkjGIgeL3vEU3wyRZN0QaZLAsyEzwc9nXGT2zY/CAJAx/r9kCg==
+monkey-typescript@^0.0.23:
+  version "0.0.23"
+  resolved "https://registry.yarnpkg.com/monkey-typescript/-/monkey-typescript-0.0.23.tgz#61d00a4c1c3c576a1904ea4fa1a4eb4802ab3b2b"
+  integrity sha512-XPAC4OYJJGP6RoC4JPtHbRUjvWPraw1nQ1C2qYQqvE/EAYBryM3voBTcf2RSNaPSRK8PJ92E3HwQgvKOLv7ZoA==
 
 move-concurrently@^1.0.1:
   version "1.0.1"
@@ -8418,7 +8418,7 @@ prompts@^2.0.1:
     kleur "^3.0.2"
     sisteransi "^1.0.0"
 
-prop-types@^15.6.2:
+prop-types@^15.6.1, prop-types@^15.6.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -8638,6 +8638,13 @@ react-error-overlay@^5.1.6:
   version "5.1.6"
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-5.1.6.tgz#0cd73407c5d141f9638ae1e0c63e7b2bf7e9929d"
   integrity sha512-X1Y+0jR47ImDVr54Ab6V9eGk0Hnu7fVWGeHQSOXHf/C2pF9c6uy3gef8QUeuUiWlNb0i08InPSE5a/KJzNzw1Q==
+
+react-file-drop@^0.2.8:
+  version "0.2.8"
+  resolved "https://registry.yarnpkg.com/react-file-drop/-/react-file-drop-0.2.8.tgz#de1e26cef0f1a5855fa1fb1e0cee32bc03c34466"
+  integrity sha512-tcrDDbU25C45eusLGpnRg5qx7BexsjJ+5qZMnjwvj0IrRiv7VWEtJ2h2XZsLCkuaAtQe8cF5WYFJbzhfctoZjA==
+  dependencies:
+    prop-types "^15.6.1"
 
 react-is@^16.8.1:
   version "16.8.4"

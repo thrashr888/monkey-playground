@@ -16,8 +16,9 @@ class CurFile extends Component {
 
     // defaults
     this.state = {
-      name: props.name,
-      text: props.text,
+      loading: true,
+      name: 'loading',
+      text: '# loading',
       dirty: false,
       debug: 'console',
       console: [],
@@ -50,14 +51,18 @@ class CurFile extends Component {
     });
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.consoleLog = [];
     this.env = NewEnvironment();
     this.env.Logger.Follow(this.followLogs.bind(this));
 
-    let [errors, output] = this.evalInput(this.props.text);
+    let name = this.props.name;
+    let text = await this.props.text;
+    let [errors, output] = this.evalInput(text);
 
     this.setState({
+      name,
+      text,
       errors,
       output,
       notifyErrors: errors.length ? true : false,
@@ -65,11 +70,11 @@ class CurFile extends Component {
     });
   }
 
-  componentDidUpdate(oldProps) {
+  async componentDidUpdate(oldProps) {
     const newProps = this.props;
     if (oldProps.name !== newProps.name) {
       let name = newProps.name;
-      let text = newProps.text;
+      let text = await newProps.text;
 
       this.consoleLog = [];
       this.env = NewEnvironment();
@@ -98,18 +103,14 @@ class CurFile extends Component {
     let name = e.target.value;
     let oldName = this.props.name;
 
-    this.setState({
-      name,
-    });
     this.props.renameFile(oldName, name);
+    this.setState({ name });
   }
 
-  handleSave() {
+  async handleSave() {
     if (this.state.dirty) {
-      this.props.updateFile(this.state.name, this.state.text);
-      this.setState({
-        dirty: false,
-      });
+      await this.props.updateFile(this.state.name, this.state.text);
+      this.setState({ dirty: false });
     }
   }
 
@@ -240,7 +241,7 @@ class CurFile extends Component {
             <Editor
               value={this.state.text}
               onValueChange={this.handleChange}
-              highlight={text => highlight(text, languages.js, 'javascript')}
+              highlight={text => highlight(text || '', languages.js, 'javascript')}
               padding={10}
               className="container__editor"
               style={{
@@ -253,7 +254,7 @@ class CurFile extends Component {
             <Editor
               value={this.state.output.join('\n')}
               onValueChange={() => null}
-              highlight={output => highlight(output, languages.js, 'javascript')}
+              highlight={output => highlight(output || '', languages.js, 'javascript')}
               padding={10}
               className="container__output"
               style={{

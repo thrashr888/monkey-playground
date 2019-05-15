@@ -1,8 +1,8 @@
-export class File {
+export class LocalStorageFile {
   static INDEX = 'FILE::';
 
   static get(name) {
-    let key = `${File.INDEX}${name}`;
+    let key = `${LocalStorageFile.INDEX}${name}`;
 
     if (localStorage.getItem(key)) {
       let value = localStorage.getItem(key);
@@ -11,14 +11,8 @@ export class File {
     return null;
   }
 
-  static exists(name) {
-    let key = `${File.INDEX}${name}`;
-
-    return localStorage.getItem(key) ? true : false;
-  }
-
   static set(name, content) {
-    let key = `${File.INDEX}${name}`;
+    let key = `${LocalStorageFile.INDEX}${name}`;
     let value = JSON.stringify(content);
 
     if (localStorage.getItem(key)) {
@@ -31,7 +25,7 @@ export class File {
   }
 
   static delete(name) {
-    let key = `${File.INDEX}${name}`;
+    let key = `${LocalStorageFile.INDEX}${name}`;
 
     if (localStorage.getItem(key)) {
       localStorage.removeItem(key);
@@ -42,7 +36,7 @@ export class File {
   }
 }
 
-export default class Files {
+export default class LocalStorageFiles {
   INDEX = '__INDEX__';
   size = 0;
 
@@ -60,15 +54,11 @@ export default class Files {
   }
 
   get(name) {
-    return File.get(name);
-  }
-
-  exists(name) {
-    return File.exists(name);
+    return LocalStorageFile.get(name);
   }
 
   set(name, content) {
-    if (!File.set(name, content)) {
+    if (!LocalStorageFile.set(name, content)) {
       let files = this.keys();
       files.push(name);
       localStorage.setItem(this.INDEX, JSON.stringify(files));
@@ -76,9 +66,22 @@ export default class Files {
   }
 
   delete(name) {
-    File.delete(name);
+    LocalStorageFile.delete(name);
     let files = this.keys();
     files = files.filter(i => i !== name);
     localStorage.setItem(this.INDEX, JSON.stringify(files));
+  }
+
+  move(oldName, newName) {
+    let content = this.get(oldName);
+    this.set(newName, content);
+    this.delete(oldName);
+    return true;
+  }
+
+  copy(fromName, toName) {
+    let content = this.get(fromName);
+    this.set(toName, content);
+    return true;
   }
 }

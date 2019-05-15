@@ -14,17 +14,10 @@ class App extends Component {
 
     this.Storage = new Storage();
 
-    let files = this.Storage.list();
-    if (!files || files.length === 0) {
-      this.Storage.write('new.monkey', 'let example = 1;');
-      files = this.Storage.list();
-    }
-
-    let curFile = this.getFileFromUrl() || this.Storage.first();
-    window.location.hash = curFile;
     this.state = {
-      curFile,
-      files,
+      curFile: null,
+      files: [],
+      error: null,
     };
 
     this.switchFile = this.switchFile.bind(this);
@@ -34,78 +27,104 @@ class App extends Component {
     this.deleteFile = this.deleteFile.bind(this);
   }
 
-  getFileFromUrl() {
+  async componentDidMount() {
+    let files = await this.Storage.list();
+    if (!files || files.length === 0) {
+      await this.Storage.write('new.monkey', 'let example = 1;');
+      files = await this.Storage.list();
+    }
+
+    let curFile = (await this.getFileFromUrl()) || (await this.Storage.first());
+    window.location.hash = curFile;
+    this.setState({
+      curFile,
+      files,
+    });
+  }
+
+  async getFileFromUrl() {
     if (!window.location.hash) return false;
 
     let file = window.location.hash.substr(1);
 
-    if (!this.Storage.exists(file)) {
+    try {
+      let exists = await this.Storage.read(file);
+      if (!exists) {
+        return false;
+      }
+      return file;
+    } catch (err) {
       return false;
     }
-
-    return file;
   }
 
   switchFile(curFile) {
-    console.log('switch file', curFile);
+    console.info('switch file', curFile);
     window.location.hash = curFile;
 
     this.setState({ curFile });
   }
 
-  updateFile(name, text) {
-    console.log('save file', name);
+  async updateFile(name, text) {
+    console.info('save file', name);
 
-    this.Storage.write(name, text);
+    await this.Storage.write(name, text);
   }
 
-  addFile(name = 'new.monkey', text = null) {
+  async addFile(name = 'new.monkey', text = null) {
     // get an available new file name
     let newName = name;
     let newText = text ? text : 'let example = 1;';
 
+    let newNum = 0;
     while (true) {
-      if (this.Storage.read(newName) === null) break;
+      // rename with randNum if file name already exists
+      try {
+        await this.Storage.read(newName);
+      } catch {
+        break;
+      }
       let fileName = name.substr(0, name.indexOf('.'));
-      let randNum = Math.floor(Math.random() * Math.floor(100));
-      if (!text) newText = `let example = ${randNum};`; // only if not given
-      newName = `${fileName}-${randNum}.${EXT}`;
+      newNum++;
+      if (!text) newText = `let example = ${newNum};`; // only if not given
+      newName = `${fileName}-${newNum}.${EXT}`;
     }
 
-    console.log('add file', newName);
+    console.info('add file', newName);
 
-    this.Storage.write(newName, newText);
+    await this.Storage.write(newName, newText);
     window.location.hash = newName;
 
-    let files = this.Storage.list();
+    let files = await this.Storage.list();
     this.setState({
       files,
       curFile: newName,
     });
   }
 
-  renameFile(oldName, newName) {
-    console.log('rename file', oldName, newName);
+  async renameFile(oldName, newName) {
+    console.info('rename file', oldName, newName);
 
-    this.Storage.move(oldName, newName);
-    window.location.hash = newName;
-
-    let files = this.Storage.list();
-    this.setState({
-      files,
-      curFile: newName,
-    });
+    try {
+      await this.Storage.move(oldName, newName);
+      this.setState({ error: null, curFile: newName, files: await this.Storage.list() });
+      window.location.hash = newName;
+    } catch (err) {
+      let error = `cannot rename file to ${newName}`;
+      console.error('App.renameFile error:', error, err);
+      this.setState({ error });
+    }
   }
 
-  deleteFile(name) {
-    console.log('delete file', name);
+  async deleteFile(name) {
+    console.info('delete file', name);
 
-    this.Storage.delete(name);
+    await this.Storage.delete(name);
 
-    let curFile = this.Storage.first();
+    let curFile = await this.Storage.first();
     window.location.hash = curFile;
 
-    let files = this.Storage.list();
+    let files = await this.Storage.list();
     this.setState({
       files,
       curFile,
@@ -140,20 +159,30 @@ class App extends Component {
           </div>
         </section>
 
+        {this.state.error ? <div>Error: {this.state.error}</div> : null}
+
         <div className="columns">
-          <Files
-            files={this.state.files}
-            curFile={this.state.curFile}
-            chooseFile={this.switchFile}
-            addFile={this.addFile}
-          />
-          <CurFile
-            name={this.state.curFile}
-            text={this.Storage.read(this.state.curFile)}
-            updateFile={this.updateFile}
-            renameFile={this.renameFile}
-            deleteFile={this.deleteFile}
-          />
+          {this.state.files && this.state.curFile ? (
+            <Files
+              files={this.state.files}
+              curFile={this.state.curFile}
+              chooseFile={this.switchFile}
+              addFile={this.addFile}
+            />
+          ) : (
+            <div>Loading...</div>
+          )}
+          {this.state.curFile ? (
+            <CurFile
+              name={this.state.curFile}
+              text={this.Storage.read(this.state.curFile)}
+              updateFile={this.updateFile}
+              renameFile={this.renameFile}
+              deleteFile={this.deleteFile}
+            />
+          ) : (
+            <div>Loading...</div>
+          )}
         </div>
       </section>
     );

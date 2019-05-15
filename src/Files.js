@@ -52,7 +52,6 @@ class Files extends Component {
   }
 
   handleDrop = async (files, event) => {
-    console.log(files, event);
     let file = files[0];
 
     if (file.type !== '') {

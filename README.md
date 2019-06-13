@@ -16,13 +16,17 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ## TODO/Ideas
 
 - [x] Switch to https://github.com/filerjs/filer for files backend
+- [ ] Format numbers on right side using commas/intl
 - [ ] Handle async loading & actions (save, rename, etc) better
 - [ ] Auto-select new filename
 - [ ] Add button icons
 - [ ] Add about page
 - [ ] Fix wrapped-line alignment
-- [ ] Save/load from S3
-- [ ] Print out React/HTML DOM?
+- [ ] Introduce a collection UUID (user, codebase, file grouping, and/or repo)
+- [ ] Markdown in comments?
+- [ ] Inline results instead of right-hand-side?
+- [-] Save/load from S3
+- [-] Print out React/HTML DOM?
 - [ ] Output arrays and objects as tables
 - [ ] Line numbers
 - [ ] Inline errors
@@ -31,3 +35,4 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 - [ ] Embedable version?
 - [ ] Run via Lambda somehow?
 - [ ] Accept live HTTP requests somehow?
+- [ ] Dark mode
